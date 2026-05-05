@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Fun Facts</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .fact-card {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .fact-text {
+            font-size: 1.3em;
+            color: #333;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .fact-category {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            width: fit-content;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        button {
+            padding: 12px 30px;
+            font-size: 1em;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-next {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            flex: 1;
+        }
+
+        .btn-next:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-next:active {
+            transform: translateY(0);
+        }
+
+        .btn-copy {
+            background: #f0f0f0;
+            color: #333;
+            border: 2px solid #667eea;
+            padding: 10px 20px;
+            font-size: 0.9em;
+        }
+
+        .btn-copy:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .fact-counter {
+            text-align: center;
+            color: #999;
+            font-size: 0.9em;
+            margin-top: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .fact-text {
+                font-size: 1.1em;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn-copy {
+                padding: 12px 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎉 Fun Facts</h1>
+            <p>Click the button below to discover amazing facts!</p>
+        </div>
+
+        <div class="fact-card">
+            <div class="fact-category" id="category">Science</div>
+            <p class="fact-text" id="fact">Loading your fact...</p>
+            <div class="fact-counter">
+                <span id="counter">1</span> / <span id="total">50</span>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button class="btn-next" onclick="getRandomFact()">Next Fact 🚀</button>
+            <button class="btn-copy" onclick="copyFactToClipboard()">Copy 📋</button>
+        </div>
+    </div>
+
+    <script>
+        const facts = [
+            { text: "Honey never spoils. Archaeologists have found 3000-year-old honey in Egyptian tombs that was still edible!", category: "Nature" },
+            { text: "A group of flamingos is called a 'flamboyance'.", category: "Animals" },
+            { text: "Octopuses have three hearts and blue blood.", category: "Animals" },
+            { text: "The Eiffel Tower can be 15 cm taller during the summer due to thermal expansion.", category: "Science" },
+            { text: "Bananas are berries, but strawberries aren't!", category: "Nature" },
+            { text: "A day on Venus is longer than its year.", category: "Space" },
+            { text: "Butterflies taste with their feet.", category: "Animals" },
+            { text: "The Great Wall of China isn't visible from space without aid.", category: "Geography" },
+            { text: "Wombats poop cubes to mark their territory.", category: "Animals" },
+            { text: "Scotland's national animal is a unicorn.", category: "History" },
+            { text: "Cleopatra lived closer to the invention of the iPhone than to the building of the Great Pyramid.", category: "History" },
+            { text: "Tardigrades (water bears) can survive in space.", category: "Science" },
+            { text: "There are more stars in the universe than grains of sand on all Earth's beaches.", category: "Space" },
+            { text: "Your nose can remember 50,000 different scents.", category: "Science" },
+            { text: "Penguins propose to their mates with a pebble.", category: "Animals" },
+            { text: "Cats have a unique nose print pattern, like a human fingerprint.", category: "Animals" },
+            { text: "The world's oldest known recipe is for beer.", category: "History" },
+            { text: "Sloth fur can take up to a month to decompose after the animal dies.", category: "Nature" },
+            { text: "Carrots weren't originally orange; they were purple.", category: "Nature" },
+            { text: "A group of crows is called a 'murder'.", category: "Animals" },
+            { text: "Dolphins have names for each other.", category: "Animals" },
+            { text: "The fingerprints of koalas are almost indistinguishable from human fingerprints.", category: "Animals" },
+            { text: "Honey bees dance to communicate with each other.", category: "Animals" },
+            { text: "A jiffy is an actual unit of time equal to one trillionth of a second.", category: "Science" },
+            { text: "Sloths only defecate once a week.", category: "Nature" },
+            { text: "The shortest war in history lasted 38 minutes.", category: "History" },
+            { text: "Shrimp can see ultraviolet, infrared, and polarized light.", category: "Animals" },
+            { text: "Humans and bananas share about 51% of their DNA.", category: "Science" },
+            { text: "A crocodile cannot poke its tongue out.", category: "Animals" },
+            { text: "Puffins have knees, but you can't see them under their feathers.", category: "Animals" },
+            { text: "The oldest known alphabet letters were used to write about yeast and brewing.", category: "History" },
+            { text: "Cows have best friends and get stressed when separated.", category: "Animals" },
+            { text: "A group of owls is called a 'parliament'.", category: "Animals" },
+            { text: "There's a type of jellyfish that is biologically immortal.", category: "Nature" },
+            { text: "Polar bears have black skin under their white fur.", category: "Animals" },
+            { text: "The smell of fresh-cut grass is actually a plant's cry for help.", category: "Nature" },
+            { text: "Ants have been to war with each other for over 100 million years.", category: "Animals" },
+            { text: "A group of hedgehogs is called a 'prickle'.", category: "Animals" },
+            { text: "Peanuts aren't actually nuts; they're legumes.", category: "Nature" },
+            { text: "The human body contains enough carbon to make 9,000 pencils.", category: "Science" },
+            { text: "A group of pugs is called a 'grumble'.", category: "Animals" },
+            { text: "The longest hiccuping episode lasted 68 years.", category: "History" },
+            { text: "Seahorses mate for life and swim holding each other's tails.", category: "Animals" },
+            { text: "The Great Barrier Reef is visible from the moon.", category: "Geography" },
+            { text: "A group of platypuses is called a 'paddle'.", category: "Animals" },
+            { text: "Sound travels slower in cold air than warm air.", category: "Science" },
+            { text: "Octopuses can change color and texture in 0.3 seconds.", category: "Animals" },
+            { text: "The Mona Lisa has no eyebrows.", category: "History" },
+            { text: "A group of ferrets is called a 'business'.", category: "Animals" },
+            { text: "Glass takes one million years to decompose.", category: "Science" }
+        ];
+
+        let currentFactIndex = 0;
+
+        function getRandomFact() {
+            currentFactIndex = Math.floor(Math.random() * facts.length);
+            displayFact();
+        }
+
+        function displayFact() {
+            const fact = facts[currentFactIndex];
+            document.getElementById('fact').textContent = fact.text;
+            document.getElementById('category').textContent = fact.category;
+            document.getElementById('counter').textContent = currentFactIndex + 1;
+            document.getElementById('total').textContent = facts.length;
+        }
+
+        function copyFactToClipboard() {
+            const fact = facts[currentFactIndex].text;
+            navigator.clipboard.writeText(fact).then(() => {
+                const button = event.target;
+                const originalText = button.textContent;
+                button.textContent = 'Copied! ✓';
+                setTimeout(() => {
+                    button.textContent = originalText;
+                }, 2000);
+            });
+        }
+
+        // Load a random fact on page load
+        window.addEventListener('load', getRandomFact);
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Fun Facts</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .fact-card {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .fact-text {
+            font-size: 1.3em;
+            color: #333;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .fact-category {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            width: fit-content;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        button {
+            padding: 12px 30px;
+            font-size: 1em;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-next {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            flex: 1;
+        }
+
+        .btn-next:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-next:active {
+            transform: translateY(0);
+        }
+
+        .btn-copy {
+            background: #f0f0f0;
+            color: #333;
+            border: 2px solid #667eea;
+            padding: 10px 20px;
+            font-size: 0.9em;
+        }
+
+        .btn-copy:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .fact-counter {
+            text-align: center;
+            color: #999;
+            font-size: 0.9em;
+            margin-top: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .fact-text {
+                font-size: 1.1em;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn-copy {
+                padding: 12px 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎉 Fun Facts</h1>
+            <p>Click the button below to discover amazing facts!</p>
+        </div>
+
+        <div class="fact-card">
+            <div class="fact-category" id="category">Science</div>
+            <p class="fact-text" id="fact">Loading your fact...</p>
+            <div class="fact-counter">
+                <span id="counter">1</span> / <span id="total">50</span>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button class="btn-next" onclick="getRandomFact()">Next Fact 🚀</button>
+            <button class="btn-copy" onclick="copyFactToClipboard()">Copy 📋</button>
+        </div>
+    </div>
+
+    <script>
+        const facts = [
+            { text: "Honey never spoils. Archaeologists have found 3000-year-old honey in Egyptian tombs that was still edible!", category: "Nature" },
+            { text: "A group of flamingos is called a 'flamboyance'.", category: "Animals" },
+            { text: "Octopuses have three hearts and blue blood.", category: "Animals" },
+            { text: "The Eiffel Tower can be 15 cm taller during the summer due to thermal expansion.", category: "Science" },
+            { text: "Bananas are berries, but strawberries aren't!", category: "Nature" },
+            { text: "A day on Venus is longer than its year.", category: "Space" },
+            { text: "Butterflies taste with their feet.", category: "Animals" },
+            { text: "The Great Wall of China isn't visible from space without aid.", category: "Geography" },
+            { text: "Wombats poop cubes to mark their territory.", category: "Animals" },
+            { text: "Scotland's national animal is a unicorn.", category: "History" },
+            { text: "Cleopatra lived closer to the invention of the iPhone than to the building of the Great Pyramid.", category: "History" },
+            { text: "Tardigrades (water bears) can survive in space.", category: "Science" },
+            { text: "There are more stars in the universe than grains of sand on all Earth's beaches.", category: "Space" },
+            { text: "Your nose can remember 50,000 different scents.", category: "Science" },
+            { text: "Penguins propose to their mates with a pebble.", category: "Animals" },
+            { text: "Cats have a unique nose print pattern, like a human fingerprint.", category: "Animals" },
+            { text: "The world's oldest known recipe is for beer.", category: "History" },
+            { text: "Sloth fur can take up to a month to decompose after the animal dies.", category: "Nature" },
+            { text: "Carrots weren't originally orange; they were purple.", category: "Nature" },
+            { text: "A group of crows is called a 'murder'.", category: "Animals" },
+            { text: "Dolphins have names for each other.", category: "Animals" },
+            { text: "The fingerprints of koalas are almost indistinguishable from human fingerprints.", category: "Animals" },
+            { text: "Honey bees dance to communicate with each other.", category: "Animals" },
+            { text: "A jiffy is an actual unit of time equal to one trillionth of a second.", category: "Science" },
+            { text: "Sloths only defecate once a week.", category: "Nature" },
+            { text: "The shortest war in history lasted 38 minutes.", category: "History" },
+            { text: "Shrimp can see ultraviolet, infrared, and polarized light.", category: "Animals" },
+            { text: "Humans and bananas share about 51% of their DNA.", category: "Science" },
+            { text: "A crocodile cannot poke its tongue out.", category: "Animals" },
+            { text: "Puffins have knees, but you can't see them under their feathers.", category: "Animals" },
+            { text: "The oldest known alphabet letters were used to write about yeast and brewing.", category: "History" },
+            { text: "Cows have best friends and get stressed when separated.", category: "Animals" },
+            { text: "A group of owls is called a 'parliament'.", category: "Animals" },
+            { text: "There's a type of jellyfish that is biologically immortal.", category: "Nature" },
+            { text: "Polar bears have black skin under their white fur.", category: "Animals" },
+            { text: "The smell of fresh-cut grass is actually a plant's cry for help.", category: "Nature" },
+            { text: "Ants have been to war with each other for over 100 million years.", category: "Animals" },
+            { text: "A group of hedgehogs is called a 'prickle'.", category: "Animals" },
+            { text: "Peanuts aren't actually nuts; they're legumes.", category: "Nature" },
+            { text: "The human body contains enough carbon to make 9,000 pencils.", category: "Science" },
+            { text: "A group of pugs is called a 'grumble'.", category: "Animals" },
+            { text: "The longest hiccuping episode lasted 68 years.", category: "History" },
+            { text: "Seahorses mate for life and swim holding each other's tails.", category: "Animals" },
+            { text: "The Great Barrier Reef is visible from the moon.", category: "Geography" },
+            { text: "A group of platypuses is called a 'paddle'.", category: "Animals" },
+            { text: "Sound travels slower in cold air than warm air.", category: "Science" },
+            { text: "Octopuses can change color and texture in 0.3 seconds.", category: "Animals" },
+            { text: "The Mona Lisa has no eyebrows.", category: "History" },
+            { text: "A group of ferrets is called a 'business'.", category: "Animals" },
+            { text: "Glass takes one million years to decompose.", category: "Science" }
+        ];
+
+        let currentFactIndex = 0;
+
+        function getRandomFact() {
+            currentFactIndex = Math.floor(Math.random() * facts.length);
+            displayFact();
+        }
+
+        function displayFact() {
+            const fact = facts[currentFactIndex];
+            document.getElementById('fact').textContent = fact.text;
+            document.getElementById('category').textContent = fact.category;
+            document.getElementById('counter').textContent = currentFactIndex + 1;
+            document.getElementById('total').textContent = facts.length;
+        }
+
+        function copyFactToClipboard() {
+            const fact = facts[currentFactIndex].text;
+            navigator.clipboard.writeText(fact).then(() => {
+                const button = event.target;
+                const originalText = button.textContent;
+                button.textContent = 'Copied! ✓';
+                setTimeout(() => {
+                    button.textContent = originalText;
+                }, 2000);
+            });
+        }
+
+        // Load a random fact on page load
+        window.addEventListener('load', getRandomFact);
+    </script>
+</body>
+</html>
